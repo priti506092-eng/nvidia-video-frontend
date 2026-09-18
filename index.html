@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NVIDIA AI Video Agent</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 700px;
+      margin: auto;
+      padding: 35px 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #9ca3af;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: #1f2937;
+      padding: 22px;
+      border-radius: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background: #111827;
+      color: white;
+      font-size: 16px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #76b900;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    #status {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #111827;
+      color: #d1d5db;
+      display: none;
+    }
+
+    #result {
+      margin-top: 18px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>🎬 NVIDIA AI Video Agent</h1>
+
+    <div class="subtitle">
+      Create AI videos from your prompt
+    </div>
+
+    <div class="card">
+
+      <label for="prompt">Video Prompt</label>
+
+      <textarea
+        id="prompt"
+        placeholder="Example: A cinematic sunrise over the Himalayas..."
+      ></textarea>
+
+      <button id="generateBtn" onclick="generateVideo()">
+        Generate Video
+      </button>
+
+      <div id="status"></div>
+
+      <div id="result"></div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    const API_BASE_URL =
+      "https://nvidia-video-backend.onrender.com";
+
+    async function generateVideo() {
+
+      const prompt =
+        document.getElementById("prompt").value.trim();
+
+      const button =
+        document.getElementById("generateBtn");
+
+      const status =
+        document.getElementById("status");
+
+      const result =
+        document.getElementById("result");
+
+      if (!prompt) {
+        alert("Please enter a video prompt.");
+        return;
+      }
+
+      button.disabled = true;
+
+      status.style.display = "block";
+      status.textContent = "⏳ Connecting to backend...";
+
+      result.textContent = "";
+
+      try {
+
+        const response = await fetch(
+          API_BASE_URL + "/generate",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              prompt: prompt
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        status.textContent =
+          "✅ Backend response received";
+
+        result.textContent =
+          JSON.stringify(data, null, 2);
+
+      } catch (error) {
+
+        status.textContent =
+          "❌ Request failed";
+
+        result.textContent =
+          error.message;
+
+      } finally {
+
+        button.disabled = false;
+
+      }
+    }
+
+  </script>
+
+</body>
+</html>
